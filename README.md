@@ -8,7 +8,8 @@ To satisfy the need for a centralized standard library extension for the C langu
 
 ## Goals
 1. Conform to POSIX and ANSI C standards.
-2. Freely distribute the library across popular package repositories (Homebrew, AUR, etc.).
+2. Freely distribute the across popular package repositories (Homebrew, AUR, etc.).
+3. Add libc extensions and new collections of functions and types.
 
 ## FAQ
 ### Hasn't this been tried before?
