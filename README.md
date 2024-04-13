@@ -4,12 +4,12 @@ The C-Extended Standard Library.
 ![CEX Logo](/img/cex.jpg)
 
 ## Purpose
-To satisfy the need for a centralized standard library extension for the C language.
+To satisfy the need for a central collection of high-quality C-language extensions.
 
 ## Goals
-1. Conform to POSIX and ANSI C standards.
-2. Freely distribute the across popular package repositories (Homebrew, AUR, etc.).
-3. Add libc extensions and new collections of functions and types.
+1. To be POSIX and ANSI C compliant.
+2. To be freely distributed across popular package repositories.
+3. To add libc-like extensions and entirely new collections to the C language.
 
 ## FAQ
 ### Hasn't this been tried before?
