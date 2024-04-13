@@ -30,7 +30,7 @@ char *strlstr(const char *haystack, const char *needle) {
 
         cursor = &haystack[haylen-neelen-1];
         while(cursor > haystack) {
-                if(strcmp(cursor, needle) == 0) {
+                if(strncmp(cursor, needle, neelen) == 0) {
                         return (char*)cursor;
                 }
 
