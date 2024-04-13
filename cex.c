@@ -23,13 +23,19 @@ char *strlstr(const char *haystack, const char *needle) {
         haylen = strlen(haystack);
         neelen = strlen(needle);
 
+        // TODO: Change so that 0 haystack returns NULL but 0 needle returns haystack
+        /* Exclude case in which either haystack or needle are zero-length */
+        if(haylen == 0 || needle == 0) {
+                return NULL;
+        }
+
         /* Exclude case in which needle is longer than haystack */
         if(haylen < neelen) {
                 return NULL;
         }
 
         cursor = &haystack[haylen-neelen-1];
-        while(cursor > haystack) {
+        while(cursor >= haystack) {
                 if(strncmp(cursor, needle, neelen) == 0) {
                         return (char*)cursor;
                 }
