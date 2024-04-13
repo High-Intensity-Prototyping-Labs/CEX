@@ -1,10 +1,14 @@
-# CEX.DEV
+# CEX
 The C-Extended Standard Library.
 
 ![CEX Logo](/img/cex.jpg)
 
 ## Purpose
-To satisfy the need for a centralized collection of high-quality types and methods for the C language.
+To satisfy the need for a centralized standard library extension for the C language.
+
+## Goals
+1. Conform to POSIX and ANSI C standards.
+2. Freely distribute the library across popular package repositories (Homebrew, AUR, etc.).
 
 ## FAQ
 ### Hasn't this been tried before?
@@ -12,7 +16,7 @@ Spurious attempts have been made to provide custom string support to C or even c
 
 But...
 
-1. There is no uniformity in convention or quality whatsoever – some are excellent and well-documented, others are broken and even memory leak hells. Even if they were somehow all made to be top-notch in quality and stability, I still wouldn’t have the confidence that libraries will resemble to each other or work cohesively. This issue seems intrinsic to the fact that they are the result of the development of disjoint developers, all with different needs, goals, visions and standards for their code.
+1. There is no uniformity in convention or quality whatsoever – some are excellent and well-documented, others are broken and even memory leak hells. Even if they were somehow all made to be top-notch in quality and stability, I still wouldn’t have confidence that libraries will resemble each other or work cohesively. This issue seems intrinsic to the fact that they are developed by disjoint developers, all with different needs, goals, visions and standards for their code.
 
 2. The lack of consistency and predictability among the libraries offers no opportunity for an intuition to be built around higher-level constructs like strings. Different naming conventions, different memory allocation schemes and custom error handling methods all need to be learned and applied separately to components of the same code. 
 
