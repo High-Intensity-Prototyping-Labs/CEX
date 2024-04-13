@@ -23,10 +23,14 @@ char *strlstr(const char *haystack, const char *needle) {
         haylen = strlen(haystack);
         neelen = strlen(needle);
 
-        // TODO: Change so that 0 haystack returns NULL but 0 needle returns haystack
-        /* Exclude case in which either haystack or needle are zero-length */
-        if(haylen == 0 || needle == 0) {
+        /* Exclude case when haystack is zero-length */
+        if(haylen == 0) {
                 return NULL;
+        }
+
+        /* As per strstr(3) man page, empty 'needle' argument returns 'haystack' */
+        if(neelen == 0) {
+                return (char*)haystack;
         }
 
         /* Exclude case in which needle is longer than haystack */
