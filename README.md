@@ -1,7 +1,8 @@
-# CEX
-The C-Extended Standard Library.
 
 ![CEX Logo](/img/cex.jpg)
+
+# CEX
+The C-Extended Standard Library.
 
 ## Purpose
 To satisfy the need for a central collection of high-quality C-language extensions.
