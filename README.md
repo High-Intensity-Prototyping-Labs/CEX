@@ -1,4 +1,4 @@
-![CEX Logo](/cex.jpg)
+![CEX Logo](/img/cex.jpg)
 
 # CEX.DEV
 The C-Extended Standard Library.
