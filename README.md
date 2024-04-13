@@ -6,6 +6,7 @@ The C-Extended Standard Library.
 ## Purpose
 To satisfy the need for a centralized collection of high-quality types and methods for the C language.
 
+## FAQ
 ### Hasn't this been tried before?
 Spurious attempts have been made to provide custom string support to C or even collect community-made C libraries in one place with CLI tooling.
 
