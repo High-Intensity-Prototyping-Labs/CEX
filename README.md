@@ -10,7 +10,7 @@ To satisfy the need for a central collection of high-quality C-language extensio
 ## Goals
 1. To be POSIX and ANSI C compliant.
 2. To be freely distributed across popular package repositories.
-3. To add libc-like extensions and entirely new collections to the C language.
+3. To add new and adapted extensions to the C standard library in a libc-like fashion.
 
 ## FAQ
 ### Hasn't this been tried before?
