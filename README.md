@@ -1,7 +1,7 @@
-![CEX Logo](/img/cex.jpg)
-
 # CEX.DEV
 The C-Extended Standard Library.
+
+![CEX Logo](/img/cex.jpg)
 
 ## Purpose
 To satisfy the need for a centralized collection of high-quality types and methods for the C language.
