@@ -7,6 +7,7 @@ project(
 )
 
 add_library(cex cex.c cex.h)
+set_target_properties(cex PROPERTIES PUBLIC_HEADER cex.h)
 target_compile_options(cex PRIVATE -std=c89)
 
 if(DEBUG)
@@ -16,3 +17,8 @@ endif()
 if(CEX_USE_NAMESPACE)
         target_compile_options(cex PRIVATE -DCEX_USE_NAMESPACE)
 endif()
+
+install(TARGETS
+        cex
+        PUBLIC_HEADER
+)
