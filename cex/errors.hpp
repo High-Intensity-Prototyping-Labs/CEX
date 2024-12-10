@@ -3,6 +3,7 @@
 
 // Standard C++ Dependencies
 #include <string>
+#include <memory>
 
 namespace cex {
     namespace {
@@ -20,11 +21,11 @@ namespace cex {
 
     }
 
-    typedef error_string* error;
+    typedef std::unique_ptr<error_string> error;
 
     namespace errors {
         error New(std::string text) {
-            return new error_string(text);
+            return std::unique_ptr<error_string>(new error_string(text));
         }
     }
 }
