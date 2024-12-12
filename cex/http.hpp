@@ -429,23 +429,23 @@ namespace cex {
             long    response_code;
             double  time_elapsed;
 
-            size_t (*func)(void*, size_t, size_t, char **) = [](
-                void *ptr,
-                size_t size,
-                size_t nmemb,
-                char **out_data)->size_t
-            {
-                *out_data = (char*)malloc(size * nmemb);
-                assert(*out_data != NULL);
-                memcpy(*out_data, ptr, size * nmemb);
-                return size * nmemb;
-            };
-
             curl = curl_easy_init();
             if(curl) {
                 curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
                 curl_easy_setopt(curl, CURLOPT_CA_CACHE_TIMEOUT, 604800L);
-                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, func);
+                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
+                    (size_t(*)(void*, size_t, size_t, char**))[](
+                        void *ptr,
+                        size_t size,
+                        size_t nmemb,
+                        char **out_data)->size_t
+                    {
+                        *out_data = (char*)malloc(size * nmemb);
+                        assert(*out_data != NULL);
+                        memcpy(*out_data, ptr, size * nmemb);
+                        return size * nmemb;
+                    }
+                );
                 curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
                 res = curl_easy_perform(curl);
                 curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &response_length);
