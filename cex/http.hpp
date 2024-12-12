@@ -1,20 +1,25 @@
 #ifndef CEX_HTTP
 #define CEX_HTTP
 
+// Standard C Dependencies
+#include <cstdlib>
+#include <cstdint>
+#include <cassert>
+#include <cstring>
+
 // Standard C++ Dependencies
 #include <map>
 #include <tuple>
 #include <string>
 #include <vector>
-#include <cstdint>
+#include <iostream>
+#include <algorithm>
 
 // CEX Dependencies
 #include "cex/errors.hpp"
 
 // External Dependencies
-extern "C" {
-    #include <curl/curl.h>
-}
+#include <curl/curl.h>
 
 namespace cex {
     namespace errors {
@@ -308,117 +313,198 @@ namespace cex {
         typedef std::map<std::string, std::vector<std::string>> header;
         typedef std::map<std::string, std::vector<std::string>> values;
 
-        struct response;
-        struct request;
+        namespace go {
+            struct response;
+            struct request;
 
-        struct user_info {
-            std::string username;
-            std::string password;
-            bool isset;
-        };
+            struct user_info {
+                std::string username;
+                std::string password;
+                bool isset;
+            };
 
-        struct url {
-            std::string scheme;
-            std::string opaque;
-            http::user_info user;
-            std::string host;
-            std::string path;
-            std::string raw_path;
-            bool omit_host;
-            bool force_query;
-            std::string raw_query;
-            std::string fragment;
-            std::string raw_fragment;
-        };
+            struct url {
+                std::string scheme;
+                std::string opaque;
+                go::user_info user;
+                std::string host;
+                std::string path;
+                std::string raw_path;
+                bool omit_host;
+                bool force_query;
+                std::string raw_query;
+                std::string fragment;
+                std::string raw_fragment;
+            };
 
-        struct request {
-            std::string method;
+            struct request {
+                std::string method;
 
-            http::url *url;
+                go::url *url;
 
-            std::string proto;
-            int proto_major;
-            int proto_minor;
+                std::string proto;
+                int proto_major;
+                int proto_minor;
 
-            http::header header;
+                http::header header;
 
-            int64_t content_length;
+                int64_t content_length;
 
-            std::vector<std::string> transfer_encoding;
+                std::vector<std::string> transfer_encoding;
 
-            bool close;
+                bool close;
 
-            std::string host;
+                std::string host;
 
-            http::values form;
+                http::values form;
 
-            http::values post_form;
+                http::values post_form;
 
-            http::header trailer;
+                http::header trailer;
 
-            std::string remote_addr;
+                std::string remote_addr;
 
-            std::string request_uri;
+                std::string request_uri;
 
-            http::response *response;
+                go::response *response;
 
-            std::string pattern;
-        };
+                std::string pattern;
+            };
+
+            struct response {
+                std::string status;
+                int         status_code;
+                std::string proto;
+                int         proto_major;
+                int         proto_minor;
+
+                http::header header;
+
+                int64_t content_length;
+
+                std::vector<std::string> transfer_encoding;
+
+                bool close;
+
+                bool uncompressed;
+
+                http::header trailer;
+
+                go::request *request;
+            };
+
+        }
 
         struct response {
-            std::string status;
-            int         status_code;
-            std::string proto;
-            int         proto_major;
-            int         proto_minor;
-
-            http::header header;
-
-            int64_t content_length;
-
-            std::vector<std::string> transfer_encoding;
-
-            bool close;
-
-            bool uncompressed;
-
-            http::header trailer;
-
-            http::request *request;
+            std::string url;
+            std::string data;
+            long        response_code;
+            double      time_elapsed;
         };
 
+        std::ostream& operator<<(std::ostream& out, http::response& res) {
+            std::string flat(res.data);
+            flat.erase(std::remove(flat.begin(), flat.end(), '\n'), flat.cend());
+            flat.erase(std::remove(flat.begin(), flat.end(), ' '), flat.cend());
+
+            out << "{\n"
+                << "\turl: \"" << res.url << "\",\n"
+                << "\tdata: [\n"
+                << "\t\t\"" << flat << "\",\n"
+                << "\t],\n"
+                << "\tresponse_code: " << res.response_code << ",\n"
+                << "\time_elapsed: " << res.time_elapsed << ",\n"
+                << "}";
+
+                return out;
+        }
+
+        size_t
+        writefunc(
+            void *ptr,
+            size_t size,
+            size_t nmemb,
+            char **out_data)
+        {
+            // *out_data = (char*)malloc(size * nmemb);
+            // assert(*out_data != NULL);
+            // memcpy(*out_data, ptr, size * nmemb);
+            // return size * nmemb;
+            size_t i;
+
+            *out_data = (char*)malloc(size*nmemb);
+            assert(*out_data != NULL);
+            for(i = 0; i < size*nmemb; i++) {
+                (*out_data)[i] = ((char*)ptr)[i];
+            }
+            return size*nmemb;
+        }
+
         std::tuple<http::response*, error> get(std::string url) {
-            error err;
+            int     i;
 
-            CURL *curl = curl_easy_init();
+            CURL    *curl;
+            CURLcode res;
+
+            char   *urlcstr;
+            char   *effurlcstr;
+            char   *response_data;
+            curl_off_t response_length;
+            long    response_code;
+            double  time_elapsed;
+
+            auto func = [](
+                void *ptr,
+                size_t size,
+                size_t nmemb,
+                char **out_data)->size_t
+            {
+                // *out_data = (char*)malloc(size * nmemb);
+                // assert(*out_data != NULL);
+                // memcpy(*out_data, ptr, size * nmemb);
+                // return size * nmemb;
+                size_t i;
+
+                *out_data = (char*)malloc(size*nmemb);
+                assert(*out_data != NULL);
+                for(i = 0; i < size*nmemb; i++) {
+                    (*out_data)[i] = ((char*)ptr)[i];
+                }
+                return size*nmemb;
+            };
+
+            curl = curl_easy_init();
             if(curl) {
-                curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+                urlcstr = (char*)malloc(url.size()+1);
+                for(i = 0; i < url.size(); i++) {
+                    urlcstr[i] = url[i];
+                }
+                urlcstr[i] = '\0';
 
-                CURLcode res = curl_easy_perform(curl);
+                curl_easy_setopt(curl, CURLOPT_URL, urlcstr);
+                curl_easy_setopt(curl, CURLOPT_CA_CACHE_TIMEOUT, 604800L);
+                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
+                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
+                res = curl_easy_perform(curl);
+                curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &response_length);
+                curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &effurlcstr);
+                curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+                curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &time_elapsed);
 
                 // C++11
-                if((err = errors::New(res)) != nullptr) {
-                    return std::make_tuple(nullptr, err);
+                if(res != CURLE_OK) {
+                    return std::make_tuple(nullptr, errors::New(res));
                 }
 
-                // C++17
-                // if(error err = errors::New(res); err != nullptr) {
-                //     return std::make_tuple(nullptr, err);
-                // }
-
-                http::response *response = new http::response;
-
-                curl_off_t curl_content_length;
-                res = curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &curl_content_length);
-
-                // C++11
-                if((err = errors::New(res)) != nullptr) {
-                    return std::make_tuple(nullptr, err);
-                }
-
-                response->content_length = curl_content_length;
+                http::response *response = new http::response{
+                    .url = std::string(effurlcstr),
+                    .data = std::string(response_data, response_length),
+                    .response_code = response_code,
+                    .time_elapsed = time_elapsed,
+                };
 
                 curl_easy_cleanup(curl);
+                // curl_global_cleanup();
 
                 // OK
                 return std::make_tuple(response, nullptr);
