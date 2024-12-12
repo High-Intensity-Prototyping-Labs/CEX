@@ -419,27 +419,6 @@ namespace cex {
                 return out;
         }
 
-        size_t
-        writefunc(
-            void *ptr,
-            size_t size,
-            size_t nmemb,
-            char **out_data)
-        {
-            // *out_data = (char*)malloc(size * nmemb);
-            // assert(*out_data != NULL);
-            // memcpy(*out_data, ptr, size * nmemb);
-            // return size * nmemb;
-            size_t i;
-
-            *out_data = (char*)malloc(size*nmemb);
-            assert(*out_data != NULL);
-            for(i = 0; i < size*nmemb; i++) {
-                (*out_data)[i] = ((char*)ptr)[i];
-            }
-            return size*nmemb;
-        }
-
         std::tuple<http::response*, error> get(std::string url) {
             int     i;
 
@@ -453,7 +432,7 @@ namespace cex {
             long    response_code;
             double  time_elapsed;
 
-            auto func = [](
+            size_t (*func)(void*, size_t, size_t, char **) = [](
                 void *ptr,
                 size_t size,
                 size_t nmemb,
@@ -483,7 +462,7 @@ namespace cex {
 
                 curl_easy_setopt(curl, CURLOPT_URL, urlcstr);
                 curl_easy_setopt(curl, CURLOPT_CA_CACHE_TIMEOUT, 604800L);
-                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
+                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, func);
                 curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
                 res = curl_easy_perform(curl);
                 curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &response_length);
