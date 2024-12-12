@@ -420,12 +420,9 @@ namespace cex {
         }
 
         std::tuple<http::response*, error> get(std::string url) {
-            int     i;
-
             CURL    *curl;
             CURLcode res;
 
-            char   *urlcstr;
             char   *effurlcstr;
             char   *response_data;
             curl_off_t response_length;
@@ -438,29 +435,15 @@ namespace cex {
                 size_t nmemb,
                 char **out_data)->size_t
             {
-                // *out_data = (char*)malloc(size * nmemb);
-                // assert(*out_data != NULL);
-                // memcpy(*out_data, ptr, size * nmemb);
-                // return size * nmemb;
-                size_t i;
-
-                *out_data = (char*)malloc(size*nmemb);
+                *out_data = (char*)malloc(size * nmemb);
                 assert(*out_data != NULL);
-                for(i = 0; i < size*nmemb; i++) {
-                    (*out_data)[i] = ((char*)ptr)[i];
-                }
-                return size*nmemb;
+                memcpy(*out_data, ptr, size * nmemb);
+                return size * nmemb;
             };
 
             curl = curl_easy_init();
             if(curl) {
-                urlcstr = (char*)malloc(url.size()+1);
-                for(i = 0; i < url.size(); i++) {
-                    urlcstr[i] = url[i];
-                }
-                urlcstr[i] = '\0';
-
-                curl_easy_setopt(curl, CURLOPT_URL, urlcstr);
+                curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
                 curl_easy_setopt(curl, CURLOPT_CA_CACHE_TIMEOUT, 604800L);
                 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, func);
                 curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
