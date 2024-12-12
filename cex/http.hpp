@@ -440,8 +440,7 @@ namespace cex {
                         size_t nmemb,
                         char **out_data)->size_t
                     {
-                        *out_data = (char*)malloc(size * nmemb);
-                        assert(*out_data != NULL);
+                        *out_data = new char[size*nmemb];
                         memcpy(*out_data, ptr, size * nmemb);
                         return size * nmemb;
                     }
@@ -465,6 +464,7 @@ namespace cex {
                     .time_elapsed = time_elapsed,
                 };
 
+                delete response_data;
                 curl_easy_cleanup(curl);
                 // curl_global_cleanup();
 
