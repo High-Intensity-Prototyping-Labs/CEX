@@ -396,43 +396,31 @@ namespace cex {
         }
 
         struct response {
-            std::string url;
-            std::string data;
-            long        response_code;
-            double      time_elapsed;
+            char       *data;
+            curl_off_t  data_len;
+
+            long        code;
+            double      time;
+
+            char       *effective_url;
+
+            std::string Body(void) const {
+                return std::string(data, data_len);
+            }
         };
-
-        std::ostream& operator<<(std::ostream& out, http::response& res) {
-            std::string flat(res.data);
-            flat.erase(std::remove(flat.begin(), flat.end(), '\n'), flat.cend());
-            flat.erase(std::remove(flat.begin(), flat.end(), ' '), flat.cend());
-
-            out << "{\n"
-                << "\turl: \"" << res.url << "\",\n"
-                << "\tdata: [\n"
-                << "\t\t\"" << flat << "\",\n"
-                << "\t],\n"
-                << "\tresponse_code: " << res.response_code << ",\n"
-                << "\time_elapsed: " << res.time_elapsed << ",\n"
-                << "}";
-
-                return out;
-        }
 
         std::tuple<http::response*, error> get(std::string url) {
             CURL    *curl;
             CURLcode res;
 
-            char   *effurlcstr;
-            char   *response_data;
-            curl_off_t response_length;
-            long    response_code;
-            double  time_elapsed;
+            http::response *response = new http::response;
 
+            // Initialize cURL
             curl = curl_easy_init();
+
             if(curl) {
+                // Configure cURL
                 curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-                curl_easy_setopt(curl, CURLOPT_CA_CACHE_TIMEOUT, 604800L);
                 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
                     (size_t(*)(void*, size_t, size_t, char**))[](
                         void *ptr,
@@ -445,26 +433,23 @@ namespace cex {
                         return size * nmemb;
                     }
                 );
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
+                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response->data);
+
+                // Perform request
                 res = curl_easy_perform(curl);
-                curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &response_length);
-                curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &effurlcstr);
-                curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-                curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &time_elapsed);
 
                 // C++11
                 if(res != CURLE_OK) {
                     return std::make_tuple(nullptr, errors::New(res));
                 }
 
-                http::response *response = new http::response{
-                    .url = std::string(effurlcstr),
-                    .data = std::string(response_data, response_length),
-                    .response_code = response_code,
-                    .time_elapsed = time_elapsed,
-                };
+                // Get cURL internals into response
+                curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &response->data_len);
+                curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &response->effective_url); // WARNING: Will be lost
+                curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response->code);
+                curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &response->time);
 
-                delete response_data;
+                // Cleanup cURL
                 curl_easy_cleanup(curl);
                 // curl_global_cleanup();
 
