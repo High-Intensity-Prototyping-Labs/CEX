@@ -4,7 +4,7 @@ A CEX language extension proposal. Heavily inspired by golang's `http` library.
 ## Premise
 C and C++ were conceived of in a time prior to the prevalence and promiscuity of the Internet.
 
-This is fine and hasn't stopped the development of external libraries to be developed to satisfy this end. 
+This is fine and hasn't stopped the development of external libraries to be developed to satisfy this end.
 
 Unfortunately, they have failed to provide these core features under a unified front, or in a "natural C/C++" way, or both.
 
@@ -41,7 +41,6 @@ Is this so hard? Is this so much to ask for?
 #include <cex/http>
 
 namespace http = ::cex::http;
-namespace io = ::cex::io;
 
 int main(void) {
     std::tie(res, err) = http::get("http://example.com");
@@ -72,6 +71,6 @@ Indeed, it would not be right to cite multiple sources of inspiration as admirab
 
 In other words, it would be far better to have concurrently maintained `cex::py::http` and `cex::go::http` namespace-separated instances of library improvements than any manner of half-Go-half-Python implement under a single `cex::http` name. (Why bother if it's going to suck, anyway?)
 
-So I digress. I hope at least to have elucidated a bit on why, here and now, Go is being sourced for inspiration: for no reason *other* than the fact that this is the current inspiration for this specific extension. 
+So I digress. I hope at least to have elucidated a bit on why, here and now, Go is being sourced for inspiration: for no reason *other* than the fact that this is the current inspiration for this specific extension.
 
 May God have mercy on us.
