@@ -25,5 +25,5 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    std::cout << res << std::endl;
+    std::cout << res->body() << std::endl;
 }
