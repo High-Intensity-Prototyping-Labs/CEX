@@ -12,7 +12,7 @@ namespace cex {
                 this->s = text;
             }
 
-            std::string Error(void) {
+            std::string error(void) {
                 return this->s;
             }
         private:
@@ -24,7 +24,7 @@ namespace cex {
     typedef std::unique_ptr<error_string> error;
 
     namespace errors {
-        error New(std::string text) {
+        error from(std::string text) {
             return std::unique_ptr<error_string>(new error_string(text));
         }
     }

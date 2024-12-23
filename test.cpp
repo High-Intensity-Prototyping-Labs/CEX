@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     const char *url;
 
     if(argc < 2) {
-        url = "https://example.com";
+        url = "https://google.com";
     } else {
         url = argv[1];
     }
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     auto [ res, err ] = http::get(url);
 
     if(err != nullptr) {
-        std::cerr << err->Error() << std::endl;
+        std::cerr << err->error() << std::endl;
         exit(1);
     }
 

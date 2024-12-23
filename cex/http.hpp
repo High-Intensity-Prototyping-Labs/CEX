@@ -24,8 +24,8 @@
 
 namespace cex {
     namespace errors {
-        cex::error New(CURLcode cc) {
-            return errors::New(curl_easy_strerror(cc));
+        cex::error from(CURLcode cc) {
+            return errors::from(curl_easy_strerror(cc));
         }
     }
 
@@ -68,7 +68,7 @@ namespace cex {
 
                 // C++11
                 if(res != CURLE_OK) {
-                    return std::make_tuple(nullptr, errors::New(res));
+                    return std::make_tuple(nullptr, errors::from(res));
                 }
 
                 // Get cURL internals into response
@@ -86,7 +86,7 @@ namespace cex {
             }
 
             // FAIL
-            return std::make_tuple(nullptr, errors::New(res));
+            return std::make_tuple(nullptr, errors::from(res));
         }
     }
 }
