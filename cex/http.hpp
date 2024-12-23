@@ -38,7 +38,7 @@ namespace cex {
             }
         };
 
-        std::tuple<std::unique_ptr<http::response>, cex::error> get(std::string url) {
+        std::tuple<std::unique_ptr<http::response>, cex::error> get(const char *url) {
             CURL    *curl;
             CURLcode res;
 
@@ -48,7 +48,7 @@ namespace cex {
 
             if(curl) {
                 // Configure cURL
-                curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+                curl_easy_setopt(curl, CURLOPT_URL, url);
                 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
                     (size_t(*)(void*, size_t, size_t, char**))[](
                         void *ptr,

@@ -10,7 +10,7 @@
 namespace http = ::cex::http;
 
 int main(int argc, char *argv[]) {
-    std::string url;
+    const char *url;
 
     if(argc < 2) {
         url = "https://example.com";
