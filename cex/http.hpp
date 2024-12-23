@@ -38,7 +38,7 @@ namespace cex {
             }
         };
 
-        std::tuple<http::response*, cex::error> get(std::string url) {
+        std::tuple<std::unique_ptr<http::response>, cex::error> get(std::string url) {
             CURL    *curl;
             CURLcode res;
 
@@ -82,7 +82,7 @@ namespace cex {
                 // curl_global_cleanup();
 
                 // OK
-                return std::make_tuple(response.release(), nullptr); // Release response to caller
+                return std::make_tuple(std::move(response), nullptr); // Move response to tuple
             }
 
             // FAIL
