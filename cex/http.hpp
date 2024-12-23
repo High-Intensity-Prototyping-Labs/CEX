@@ -42,7 +42,7 @@ namespace cex {
             CURL    *curl;
             CURLcode res;
 
-            http::response *response = new http::response;
+            std::unique_ptr<http::response> response(new http::response);
 
             curl = curl_easy_init();
 
@@ -82,7 +82,7 @@ namespace cex {
                 // curl_global_cleanup();
 
                 // OK
-                return std::make_tuple(response, nullptr); // WHAT does .get() do??
+                return std::make_tuple(response.release(), nullptr); // Release response to caller
             }
 
             // FAIL
