@@ -1,0 +1,2 @@
+Dec 25, 2024
+Currently, when enabling CURLOPT_FOLLOWLOCATION when performing GET requests with libcurl in cex::http::get(), there is an uncaught string exception in the parent caller (main) trying to print the string. This is perplexing because the problem does not occur when it is not enabled.
